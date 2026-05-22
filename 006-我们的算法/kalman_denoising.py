@@ -30,7 +30,6 @@ NOISE_COLS = [
 ]
 
 
-# ─── Kalman 滤波核心函数 ───────────────────────────────────────────────────────
 def kalman_filter_1d(observations: np.ndarray, Q: float, R: float) -> np.ndarray:
     """
     单通道 1D Kalman 滤波（随机游走模型）。
@@ -40,23 +39,18 @@ def kalman_filter_1d(observations: np.ndarray, Q: float, R: float) -> np.ndarray
     返回: 滤波后的去噪估计序列
     """
     n = len(observations)
-    x = observations[0]   # 初始状态估计 = 第一个观测值
-    P = R                 # 初始估计误差协方差
-
+    x = observations[0]
+    P = R
     estimates = np.empty(n)
     for i, z in enumerate(observations):
-        # 预测步
         P = P + Q
-        # 更新步
-        K = P / (P + R)       # Kalman 增益
-        x = x + K * (z - x)  # 状态更新
-        P = (1.0 - K) * P    # 误差协方差更新
+        K = P / (P + R)
+        x = x + K * (z - x)
+        P = (1.0 - K) * P
         estimates[i] = x
-
     return estimates
 
 
-# ─── 从训练集自动估计每个通道的 Q、R ──────────────────────────────────────────
 def estimate_params(train_df: pd.DataFrame):
     """
     从训练集估计每个通道的过程噪声方差 Q 和观测噪声方差 R。
@@ -67,15 +61,12 @@ def estimate_params(train_df: pd.DataFrame):
     for target, noise in zip(TARGET_COLS, NOISE_COLS):
         true_vals  = train_df[target].values
         noisy_vals = train_df[noise].values
-
-        R = float(np.var(noisy_vals - true_vals))          # 观测噪声方差
-        Q = float(np.var(np.diff(true_vals)))              # 过程噪声方差
+        R = float(np.var(noisy_vals - true_vals))
+        Q = float(np.var(np.diff(true_vals)))
         params[target] = (Q, R)
-
     return params
 
 
-# ─── 主流程 ────────────────────────────────────────────────────────────────────
 def main():
     print("=" * 55)
     print("  自适应 Kalman 滤波去噪算法")
@@ -92,7 +83,6 @@ def main():
     params = estimate_params(train_df)
     print(f"  {'通道':<30} {'Q (信号方差)':<18} {'R (噪声方差)':<18} {'K_稳态 (增益)'}")
     for target, (Q, R) in params.items():
-        # 稳态 Kalman 增益：K* = (-R + sqrt(R²+4QR)) / (2R)  近似 Q/(Q+R)
         K_steady = Q / (Q + R) if (Q + R) > 0 else 0
         print(f"  {target:<30} {Q:<18.6f} {R:<18.6f} {K_steady:.4f}")
 
@@ -104,12 +94,10 @@ def main():
         true_vals  = train_df[target].values
         noisy_vals = train_df[noise].values
         Q, R = params[target]
-
         base_mae   = np.mean(np.abs(noisy_vals - true_vals))
         kalman_est = kalman_filter_1d(noisy_vals, Q, R)
         kalman_mae = np.mean(np.abs(kalman_est - true_vals))
         improve    = (base_mae - kalman_mae) / base_mae * 100
-
         train_maes_base.append(base_mae)
         train_maes_kalman.append(kalman_mae)
         print(f"  {target:<30} {base_mae:<22.4f} {kalman_mae:<16.4f} {improve:+.1f}%")
@@ -127,11 +115,9 @@ def main():
         kalman_est = kalman_filter_1d(noisy_vals, Q, R)
         predictions.append(kalman_est)
 
-    # 转置为 (n_samples, n_targets)，拼成空格分隔的字符串
-    pred_matrix = np.stack(predictions, axis=1)   # shape: (n, 6)
+    pred_matrix  = np.stack(predictions, axis=1)
     pred_strings = [' '.join(map(str, row)) for row in pred_matrix]
-
-    result_df = pd.DataFrame({'Predicted_Value': pred_strings})
+    result_df    = pd.DataFrame({'Predicted_Value': pred_strings})
     result_df.to_csv(OUTPUT_PATH, index=False)
     print(f"  预测结果已保存至 {OUTPUT_PATH}")
 
