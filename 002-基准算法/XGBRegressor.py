@@ -5,6 +5,7 @@
 # 指导老师：周伟老师
 # coding=utf-8
 import time
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
@@ -18,14 +19,17 @@ from scipy import stats
 
 start_time = time.time()
 
+# ─── 数据路径（相对于本脚本所在目录的上级项目根目录）────────────────────────
+_ROOT = Path(__file__).resolve().parent.parent
+
 # 特征标准化
 scaler = StandardScaler()
 # 加载数据集
 # 训练集：661（含真实值），用于训练模型
-train_dataSet = pd.read_csv(r"../001-数据集/ML期末数据集（含真实值）/modified_数据集Time_Series661.dat")
+train_dataSet = pd.read_csv(str(_ROOT / "001-数据集/ML期末数据集（含真实值）/modified_数据集Time_Series661.dat"))
 
 # 测试集：662（不含真实值），仅提供噪声特征用于预测
-test_dataSet = pd.read_csv(r"../001-数据集/ML期末数据集（不含真实值）/modified_数据集Time_Series662.dat")
+test_dataSet = pd.read_csv(str(_ROOT / "001-数据集/ML期末数据集（不含真实值）/modified_数据集Time_Series662.dat"))
 
 
 # columns表示原始列，noise_columns表示添加噪声的额列
@@ -153,7 +157,7 @@ for Predicted_Value in y_predict:
     results.append([formatted_predicted_value])
 
 result_df = pd.DataFrame(results, columns=['Predicted_Value'])
-result_df.to_csv("result_XGB.csv", index=False)
+result_df.to_csv(str(Path(__file__).resolve().parent / "result_XGB.csv"), index=False)
 
 
 print("预测结果已保存至 result_XGB.csv")

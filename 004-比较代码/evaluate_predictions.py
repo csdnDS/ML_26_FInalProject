@@ -1,14 +1,21 @@
 import pandas as pd
 import numpy as np
+from pathlib import Path
 
-tag = True
-if tag:
-    pred_file_path = r'../002-基准算法/result_XGB.csv'  #基准算法结果
-else:
-    pred_file_path = r'../result_Kalman.csv'  #我们的算法结果
-true_file_path = r"../001-数据集/ML期末数据集（含真实值）/modified_数据集Time_Series662.dat"
+# 可选: "XGB" | "Kalman" | "BiLSTM_Attn"
+ALGORITHM = "BiLSTM_Attn"
 
-pred_data = pd.read_csv(pred_file_path)
+_ROOT = Path(__file__).resolve().parent.parent
+
+PRED_PATHS = {
+    "XGB":         str(_ROOT / "002-基准算法/result_XGB.csv"),
+    "Kalman":      str(_ROOT / "006-我们的算法/result_Kalman.csv"),
+    "BiLSTM_Attn": str(_ROOT / "006-我们的算法/result_BiLSTM_Attn.csv"),
+}
+
+true_file_path = str(_ROOT / "001-数据集/ML期末数据集（含真实值）/modified_数据集Time_Series662.dat")
+
+pred_data = pd.read_csv(PRED_PATHS[ALGORITHM])
 true_data = pd.read_csv(true_file_path)
 
 target_columns = ['T_SONIC', 'CO2_density', 'CO2_density_fast_tmpr', 'H2O_density', 'H2O_sig_strgth', 'CO2_sig_strgth']
@@ -22,11 +29,8 @@ errors = np.abs(pred_values - true_values)
 mean_errors = np.mean(errors, axis=0)
 overall_mean_error = np.mean(errors)
 
+print(f"算法: {ALGORITHM}")
 print("每个特征的平均误差：")
 for feature, error in zip(target_columns, mean_errors):
-    print(f"{feature}: {error:.4f}")
-
-if tag:
-    print(f"\nXGB总体平均误差: {overall_mean_error:.4f}")
-else:
-    print(f"\nKalman总体平均误差: {overall_mean_error:.4f}")
+    print(f"  {feature}: {error:.4f}")
+print(f"\n{ALGORITHM} 总体平均误差: {overall_mean_error:.4f}")

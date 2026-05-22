@@ -9,13 +9,15 @@
 import time
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 start_time = time.time()
 
-# ─── 数据路径（与原始基准算法保持一致，修改为你的实际路径）─────────────────
-TRAIN_PATH = "001-数据集/ML期末数据集（含真实值）/modified_数据集Time_Series661.dat"
-TEST_PATH  = "001-数据集/ML期末数据集（不含真实值）/modified_数据集Time_Series662.dat"
-OUTPUT_PATH = "result_Kalman.csv"
+# ─── 数据路径（相对于本脚本所在目录的上级项目根目录）────────────────────────
+_ROOT = Path(__file__).resolve().parent.parent
+TRAIN_PATH  = str(_ROOT / "001-数据集/ML期末数据集（含真实值）/modified_数据集Time_Series661.dat")
+TEST_PATH   = str(_ROOT / "001-数据集/ML期末数据集（不含真实值）/modified_数据集Time_Series662.dat")
+OUTPUT_PATH = str(Path(__file__).resolve().parent / "result_Kalman.csv")
 
 # ─── 特征列定义 ────────────────────────────────────────────────────────────────
 TARGET_COLS = [
