@@ -3,3 +3,9 @@
 005-数据集CSV格式*/
 .idea/
 .DS_Store
+.claude/
+# 结果CSV（文件较大）
+**result_*.csv
+# 训练好的模型文件
+**/tcn_models/
+**/transformer_models/
