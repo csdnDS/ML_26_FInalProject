@@ -35,8 +35,8 @@ USE_AMP     = torch.cuda.is_available()  # 混合精度训练
 # ─── 每特征独立超参数（可针对性调整）─────────────────────────────────────────
 # key: 特征名, value: 覆盖全局超参数的字典（不写则用全局值）
 PER_FEATURE_PARAMS = {
-    'CO2_density':           {'WINDOW': 20, 'HIDDEN_SIZE': 192, 'PATIENCE': 25},
-    'CO2_density_fast_tmpr': {'WINDOW': 15, 'HIDDEN_SIZE': 192, 'PATIENCE': 25},
+    'CO2_density':           {'WINDOW': 128, 'HIDDEN_SIZE': 192, 'PATIENCE': 25},
+    'CO2_density_fast_tmpr': {'WINDOW': 128, 'HIDDEN_SIZE': 192, 'PATIENCE': 25},
 }
 
 # ─── 数据路径 ──────────────────────────────────────────────────────────────────
@@ -117,7 +117,7 @@ def train_one(model, train_loader, val_loader, lr, patience):
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', patience=7, factor=0.5
     )
-    criterion = nn.MSELoss()
+    criterion = nn.HuberLoss(delta=1.0)
     amp_scaler = torch.amp.GradScaler('cuda', enabled=USE_AMP)
 
     best_val_loss = float('inf')

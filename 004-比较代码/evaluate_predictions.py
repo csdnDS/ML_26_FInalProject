@@ -2,16 +2,17 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-# 可选: "XGB" | "Kalman" | "BiLSTM_Attn" | "Kalman_BiLSTM"
-ALGORITHM = "Kalman_BiLSTM"
+# 可选: "XGB" | "Kalman" | "BiLSTM_Attn" | "TCN" | "Transformer"
+ALGORITHM = "Transformer"
 
 _ROOT = Path(__file__).resolve().parent.parent
 
 PRED_PATHS = {
-    "XGB":          str(_ROOT / "002-基准算法/result_XGB.csv"),
-    "Kalman":       str(_ROOT / "006-我们的算法/result_Kalman.csv"),
-    "BiLSTM_Attn":  str(_ROOT / "006-我们的算法/result_BiLSTM_Attn.csv"),
-    "Kalman_BiLSTM": str(_ROOT / "006-我们的算法/result_Kalman_BiLSTM.csv"),
+    "XGB":         str(_ROOT / "002-基准算法/result_XGB.csv"),
+    "Kalman":      str(_ROOT / "006-我们的算法/result_Kalman.csv"),
+    "BiLSTM_Attn": str(_ROOT / "006-我们的算法/result_BiLSTM_Attn.csv"),
+    "TCN":         str(_ROOT / "006-我们的算法/result_TCN.csv"),
+    "Transformer": str(_ROOT / "006-我们的算法/result_Transformer.csv"),
 }
 
 true_file_path = str(_ROOT / "001-数据集/ML期末数据集（含真实值）/modified_数据集Time_Series662.dat")
