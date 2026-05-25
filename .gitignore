@@ -4,6 +4,8 @@
 .idea/
 .DS_Store
 .claude/
+**/__pycache__/
+*.pyc
 # 结果CSV（文件较大）
 **result_*.csv
 # 训练好的模型文件

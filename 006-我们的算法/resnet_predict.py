@@ -40,6 +40,25 @@ BATCH_SIZE  = 256
 device      = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+# ─── 归一化器（与训练脚本保持一致，兼容 joblib 反序列化）──────────────────────
+class ChannelStandardScaler:
+    def __init__(self):
+        self.means = None
+        self.stds  = None
+
+    def fit_transform(self, data: np.ndarray) -> np.ndarray:
+        self.means = data.mean(axis=0)
+        self.stds  = data.std(axis=0)
+        self.stds[self.stds == 0] += 1e-8
+        return (data - self.means) / self.stds
+
+    def transform(self, data: np.ndarray) -> np.ndarray:
+        return (data - self.means) / self.stds
+
+    def inverse_transform(self, data: np.ndarray) -> np.ndarray:
+        return data * self.stds + self.means
+
+
 # ─── 网络结构（与训练时完全一致）─────────────────────────────────────────────
 class SqueezeExcitation1D(nn.Module):
     def __init__(self, channels, reduction=2):
