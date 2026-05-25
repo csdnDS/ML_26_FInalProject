@@ -9,3 +9,4 @@
 # 训练好的模型文件
 **/tcn_models/
 **/transformer_models/
+**/resnet_models/
